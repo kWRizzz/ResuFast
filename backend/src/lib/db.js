@@ -1,0 +1,14 @@
+const mongoose=require('mongoose')
+
+const connectDB=async () => {
+    try {
+        const connect= await mongoose.connect(`${process.env.MONGODB_URL}`)
+        console.log(` Server Is connected to Database Succesfully ${connect.connection.host}`)
+    } catch (error) {
+        console.log(`Some Error Has Occured While Connecting to DataBase ${error}`)
+        process.exit(1);
+    }
+}
+
+
+module.exports=connectDB
