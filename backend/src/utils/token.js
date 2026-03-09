@@ -1,9 +1,9 @@
 const jwt= require('jsonwebtoken')
 
 
-const generateToken=async (email)=>{
+const generateToken= (userID,email)=>{
     try {
-        const token = jwt.sign({email},process.env.SECRET)
+        const token =  jwt.sign({userID,email},process.env.SECRET)
         return token
     } catch (error) {
         console.log(`Some Error Has Occcured While Generating User's Token`);
@@ -11,4 +11,4 @@ const generateToken=async (email)=>{
     }
 }
 
-module.exports=generateToken
+module.exports=generateToken 
