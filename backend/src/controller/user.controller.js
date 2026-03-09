@@ -1,4 +1,6 @@
-const userModel= require('../models/user.model')
+const userModel= require('../models/user.model');
+const hashPassword = require('../utils/hashPassword');
+const generateToken = require('../utils/token');
 
 const userRegister= async (req,res) => {
     try {
@@ -20,8 +22,22 @@ const userRegister= async (req,res) => {
             message:"Email Already regitered"
         })
 
-        
+        const hashedPassword= await hashPassword(password);
+        // console.log(hashedPassword)
 
+        const user= await userModel.create({
+            username,
+            useremail,
+            password:hashedPassword
+        })
+
+        const token= generateToken(user.useremail)
+
+        res.cookies("token",token)
+
+        res.status(200).json({
+            message:"User Has Been Registered"
+        })
 
     } catch (error) {
         console.log(`Error has Occured ${error}`);
@@ -29,4 +45,9 @@ const userRegister= async (req,res) => {
             message:"Some Error Has Occured"
         })
     }
+}
+
+
+module.exports={
+    userRegister
 }
