@@ -1,99 +1,154 @@
-const userModel= require('../models/user.model');
+const userModel = require('../models/user.model');
 const comparePassword = require('../utils/comparePassword');
 const hashPassword = require('../utils/hashPassword');
 const generateToken = require('../utils/token');
+const tokenModel= require('../models/token.model')
 
-const userRegister= async (req,res) => {
+const userRegister = async (req, res) => {
     try {
-        const {username, useremail , password}= req.body;
+        const { username, useremail, password } = req.body;
 
-        if(!username || !useremail || !password) return res.status(200).json({
-            message:"Enter All Credentials"
+        if (!username || !useremail || !password) return res.status(200).json({
+            message: "Enter All Credentials"
         })
 
-        if(password.length<6)return res.status(200).json({
-            message:"Password is too Weak"
+        if (password.length < 6) return res.status(200).json({
+            message: "Password is too Weak"
         })
 
-        const isExist= await userModel.findOne({
+        const isExist = await userModel.findOne({
             useremail
         })
 
-        if(isExist) return res.status(200).json({
-            message:"Email Already regitered"
+        if (isExist) return res.status(200).json({
+            message: "Email Already regitered"
         })
 
-        const hashedPassword= await hashPassword(password);
+        const hashedPassword = await hashPassword(password);
         // console.log(hashedPassword)
 
-        const user= await userModel.create({
+        const user = await userModel.create({
             username,
             useremail,
-            password:hashedPassword
+            password: hashedPassword
         })
 
-        const token= generateToken(user._id,user.useremail)
+        const token = generateToken(user._id, user.useremail)
 
-        res.cookie("token",token)
+        res.cookie("token", token)
 
         res.status(200).json({
-            message:"User Has Been Registered",
-            user:{
-                id:user._id,
-                name:user.username,
-                email:user.useremail,
-                password:user.password
+            message: "User Has Been Registered",
+            user: {
+                id: user._id,
+                name: user.username,
+                email: user.useremail,
+                password: user.password
             }
         })
 
     } catch (error) {
         console.log(`Error has Occured ${error}`);
         res.status(200).json({
-            message:`Some Error Has Occured ${error}`
+            message: `Some Error Has Occured ${error}`
         })
     }
 }
 
 
-const userLogin= async (req,res) => {
-    const {useremail,password}= req.body
+const userLogin = async (req, res) => {
 
-    if(!useremail || !password) return res.status(400).json({
-        message:"Enter All The Credentials"
-    })
+    try {
+        const { useremail, password } = req.body
 
-    const user= await userModel.findOne({useremail})
+        if (!useremail || !password) return res.status(400).json({
+            message: "Enter All The Credentials"
+        })
 
-    if (!user) {
-        return res.status(400).json({
-            message:"User Not Found"
+        const user = await userModel.findOne({ useremail })
+
+        if (!user) {
+            return res.status(400).json({
+                message: "User Not Found"
+            })
+        }
+
+        const isCorrectPassword = comparePassword(password, user.password)
+
+        if (!isCorrectPassword) return res.status(400).json({
+            message: "Entered Password Is Wrong"
+        })
+
+
+        const token = generateToken(user._id, user.useremail)
+
+        res.cookie("token", token)
+
+        res.status(200).json({
+            message: "User Has Been Registered",
+            user: {
+                id: user._id,
+                name: user.username,
+                email: user.useremail,
+                password: user.password
+            }
+        })
+
+    } catch (error) {
+        console.log(`Server Error While loggin User In  ${error}`);
+        res.status(400).json({
+            message: `Server Error While Loggin ${error}`
         })
     }
 
-    const isCorrectPassword= comparePassword(password,user.password)
+}
 
-    if(!isCorrectPassword)return res.status(400).json({
-        message:"Entered Password Is Wrong"
-    })
+const userLogout = async (req,res) => {
+    try {
+        const token =req.cookies.token
 
+        if(token){
+            await tokenModel.create({token})
+        }
 
-        const token= generateToken(user._id,user.useremail)
-
-        res.cookie("token",token)
-
+        res.clearCookie("token")
+        
         res.status(200).json({
-            message:"User Has Been Registered",
+            message:"User Has Been Loged Out SuccesFully"
+        })
+
+    } catch (error) {
+        console.log(`Some Error Has Occured While LogOut ${error}`);
+        res.status(400).json({
+            message:`Server Error In Loggin User Out ${error}`
+        })
+    }
+}
+
+const userGet= async (req,res) => {
+    try {
+        console.log(req.user)
+        const user= await userModel.findById(req.user.userID)
+        
+        res.status(200).json({
+            message:"FOunded The User",
             user:{
                 id:user._id,
                 name:user.username,
-                email:user.useremail,
-                password:user.password
+                email:user.useremail
             }
         })
+    } catch (error) {
+        console.log(`Couldnt Found The User ${error}`);
+        res.status(400).json({
+            message:`Couldnt Find Your User ${error}`
+        })
+    }
 }
 
-
-module.exports={
+module.exports = {
     userRegister,
-    userLogin
+    userLogin,
+    userLogout,
+    userGet
 }
