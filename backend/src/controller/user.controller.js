@@ -85,7 +85,7 @@ const userLogin = async (req, res) => {
         res.cookie("token", token)
 
         res.status(200).json({
-            message: "User Has Been Registered",
+            message: "User Has Been logged in",
             user: {
                 id: user._id,
                 name: user.username,

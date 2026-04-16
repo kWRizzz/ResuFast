@@ -1,7 +1,11 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-
+import {registerUser} from '../../../redux/authSlice/authSlice.js'
+import {useDispatch} from 'react-redux'
 const Register = () => {
+
+  const dispatch=useDispatch()
+
   const [name, setName] = useState("")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
@@ -12,6 +16,11 @@ const Register = () => {
   const handleSubmit = (e) => {
     e.preventDefault()
     console.log(name, email, password, confirmPassword);
+    dispatch(registerUser({
+      username:name,
+      useremail:email,
+      password
+    }))
     setName("")
     setEmail("")
     setPassword("")

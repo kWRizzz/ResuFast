@@ -1,7 +1,11 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-
+import { loginUser } from "../../../redux/authSlice/authSlice.js";
+import { useDispatch } from "react-redux";
 const Login = () => {
+
+  const dispatch= useDispatch()
+
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
 
@@ -10,6 +14,10 @@ const Login = () => {
   const handleSubmit = (e) => {
     e.preventDefault()
     console.log(email, password);
+    dispatch(loginUser({
+      useremail:email,
+      password
+    }))
     setEmail("")
     setPassword("")
   }
