@@ -2,6 +2,7 @@ const express= require('express')
 const cors= require('cors')
 const cookieparser=require('cookie-parser')
 const userRoutes=require('./routes/user.route')
+const invockGemini= require('./services/ai.services')
 
 const app= express()
 
