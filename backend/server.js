@@ -1,8 +1,8 @@
 const app= require('./src/app')
 const connectDB=require('./src/lib/db')
-const invockGemini=require('./src/services/ai.services')
+const generateContentAi=require('./src/services/ai.services')
 require('dotenv').config()
-invockGemini()
+// generateContentAi()
 connectDB()
 
 const PORT=process.env.PORT || 3000
