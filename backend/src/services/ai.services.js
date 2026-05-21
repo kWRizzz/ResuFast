@@ -30,7 +30,7 @@ const ai = new GoogleGenAI({
 const interviewReportSchema = z.object({
     matchScore: z.number().describe("A match score which varies from 0 to 100"),
     technicalQuestions: z.array(z.object({
-        questions: z.string().describe(" most important questions that can be asked "),
+        questions: z.string().describe(" the most important questions that can be asked "),
         intentions: z.string().describe("what was the intentions behind the questions asked "),
         answers: z.string().describe("what was the answers to that questions only in 100 words")
     })).describe("Tech Question should not exceed 100 words "),
